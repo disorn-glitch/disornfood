@@ -2,305 +2,311 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thai Buddhist Food - ระบบจัดการร้านค้า</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ไทย ฟู้ดส์ - Thai Foods Online</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --blue-thai: #3a7bd5;
-            --light-blue: #00d2ff;
-            --bg-gradient: linear-gradient(180deg, #e0f2ff 0%, #ffffff 100%);
+            --primary: #3a7bd5;
+            --secondary: #00d2ff;
             --white: #ffffff;
-            --success: #28a745;
-            --danger: #dc3545;
+            --bg: #f0f2f5;
+            --safe-bottom: env(safe-area-inset-bottom);
         }
 
-        * { box-sizing: border-box; font-family: 'Kanit', sans-serif; }
-        body { margin: 0; background: #f0f2f5; display: flex; justify-content: center; }
+        * { box-sizing: border-box; font-family: 'Kanit', sans-serif; -webkit-tap-highlight-color: transparent; }
 
-        .mobile-screen {
-            width: 375px;
-            height: 812px;
-            background: var(--bg-gradient);
-            position: relative;
-            overflow-y: auto;
-            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+        body { 
+            margin: 0; background: var(--bg); display: flex; justify-content: center; 
+            height: 100vh; width: 100vw; overflow: hidden; 
         }
 
-        .page { display: none; padding: 20px; animation: fadeIn 0.3s; padding-bottom: 80px; }
+        .app-container {
+            width: 100%; max-width: 500px; height: 100%;
+            background: linear-gradient(180deg, #e0f2ff 0%, #ffffff 100%);
+            position: relative; display: flex; flex-direction: column;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .content-area {
+            flex: 1; overflow-y: auto; padding: 20px;
+            padding-bottom: calc(100px + var(--safe-bottom));
+            -webkit-overflow-scrolling: touch;
+        }
+        .content-area::-webkit-scrollbar { display: none; }
+
+        .page { display: none; animation: fadeIn 0.3s ease-in-out; }
         .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* UI Elements */
-        .app-header { text-align: center; margin-bottom: 25px; }
-        .input-group { background: white; border-radius: 10px; padding: 10px; margin-bottom: 12px; border: 1px solid #ddd; }
-        .input-group label { display: block; font-size: 11px; color: #888; }
-        .input-group input { width: 100%; border: none; outline: none; font-size: 14px; background: transparent; }
+        .app-header { text-align: center; margin-bottom: 30px; }
+        .input-group { background: white; border-radius: 12px; padding: 12px; margin-bottom: 15px; border: 1px solid #eef; }
+        .input-group label { display: block; font-size: 11px; color: #888; margin-bottom: 4px; }
+        .input-group input, .input-group select { width: 100%; border: none; outline: none; font-size: 16px; background: transparent; color: #333; }
 
         .btn-blue {
-            background: linear-gradient(90deg, #3a7bd5, #00d2ff);
-            color: white; border: none; width: 100%; padding: 12px;
-            border-radius: 25px; font-size: 16px; cursor: pointer;
-            box-shadow: 0 4px 8px rgba(58, 123, 213, 0.2);
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: white; border: none; width: 100%; padding: 16px;
+            border-radius: 50px; font-size: 18px; font-weight: 600; cursor: pointer;
+            box-shadow: 0 8px 15px rgba(58, 123, 213, 0.2);
+            transition: 0.2s; margin-top: 10px;
         }
+        .btn-blue:active { transform: scale(0.98); opacity: 0.9; }
 
         /* Food Card */
         .food-card {
-            background: white; border-radius: 12px; display: flex;
-            padding: 10px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            background: white; border-radius: 16px; display: flex;
+            padding: 12px; margin-bottom: 15px; align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.03);
         }
-        .food-info { flex: 1; padding-left: 12px; }
-        .add-btn { background: var(--blue-thai); color: white; border: none; border-radius: 8px; padding: 5px 12px; cursor: pointer; }
+        .food-info { flex: 1; }
+        .add-btn { background: var(--primary); color: white; border: none; border-radius: 12px; padding: 8px 16px; font-weight: bold; cursor: pointer; }
 
-        /* Admin Dashboard */
-        .admin-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .stat-card { background: white; padding: 15px; border-radius: 12px; text-align: center; border-left: 4px solid var(--blue-thai); }
-        .stat-card h4 { margin: 0; font-size: 12px; color: #666; }
-        .stat-card p { margin: 5px 0 0; font-size: 18px; font-weight: bold; color: var(--blue-thai); }
+        /* Order Summary Card */
+        .order-summary {
+            background: white; border-radius: 20px; padding: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-top: 10px;
+        }
+        .order-item-row { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed #eee; padding-bottom: 10px; }
 
-        /* Admin Table */
-        .table-container { background: white; border-radius: 12px; overflow: hidden; font-size: 11px; }
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #f8f9fa; padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
-        td { padding: 10px; border-bottom: 1px solid #eee; }
-        .status-badge { padding: 2px 6px; border-radius: 10px; font-size: 9px; color: white; }
-        .bg-wait { background: #ffc107; color: #000; }
-        .bg-done { background: var(--success); }
-
-        /* Navigation */
         .bottom-nav {
-            position: absolute; bottom: 0; width: 100%; background: white;
-            display: flex; justify-content: space-around; padding: 12px;
+            position: absolute; bottom: 0; width: 100%; background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px); display: flex; justify-content: space-around;
+            padding: 12px 10px calc(12px + var(--safe-bottom));
             border-top: 1px solid #eee; z-index: 100;
         }
-        .nav-item { font-size: 10px; text-align: center; color: #888; cursor: pointer; border: none; background: none; }
-        .nav-item.active { color: var(--blue-thai); font-weight: bold; }
+        .nav-item { font-size: 12px; text-align: center; color: #888; border: none; background: none; flex: 1; cursor: pointer; }
+        .nav-item.active { color: var(--primary); font-weight: bold; }
+
+        /* Admin Styles */
+        .table-container { background: white; border-radius: 12px; overflow: hidden; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #f0f0f0; }
     </style>
 </head>
 <body>
 
-<div class="mobile-screen">
-    
-    <div id="page-login" class="page active">
-        <div class="app-header">
-            <div style="font-size: 50px;">🥣</div>
-            <h1>ไทย ฟู้ดส์</h1>
-            <p style="font-size: 12px; color: #666;">ระบบสั่งอาหารและจัดการร้านค้า</p>
-        </div>
-        <div class="input-group">
-            <label>ชื่อผู้ใช้งาน</label>
-            <input type="text" id="login-user" placeholder="ระบุชื่อของคุณ">
-        </div>
-        <button class="btn-blue" onclick="navTo('page-menu')">เข้าร้านค้า</button>
-        <button onclick="navTo('page-admin')" style="margin-top:20px; width:100%; border:1px solid #ccc; background:none; padding:8px; border-radius:20px; font-size:12px; color:#666;">
-            🛡️ เข้าสู่ระบบคนขาย (Admin)
-        </button>
-    </div>
-
-    <div id="page-menu" class="page">
-        <h3>เมนูอาหารไทย</h3>
-        <div id="menu-list">
-            <div class="food-card">
-                <div class="food-info">
-                    <img src="บะ.png" width="100">
-                    <strong>ก๋วยเตี๋ยวหมู</strong><br><small>50 บาท</small>
-                </div>
-                <button class="add-btn" onclick="addToCart('ก๋วยเตี๋ยวหมู', 50)">เพิ่ม</button>
-            </div>
-            <div class="food-card">
-                <div class="food-info">
-                    <strong>แกงเผ็ดไก่</strong><br><small>70 บาท</small>
-                    <img src="บะ.png" width="100">
-                </div>
-                <button class="add-btn" onclick="addToCart('แกงเผ็ดไก่', 70)">เพิ่ม</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="page-cart" class="page">
-        <h3>🛒 รายการที่สั่ง</h3>
-        <div id="cart-items" style="min-height: 100px;"></div>
-        <div style="background:white; padding:15px; border-radius:12px; margin-top:10px;">
-            <div style="display:flex; justify-content:space-between;">
-                <span>ยอดรวมทั้งหมด:</span>
-                <strong id="total-price">0 บาท</strong>
-            </div>
-        </div>
-        <button class="btn-blue" style="margin-top:20px;" onclick="navTo('page-payment')">ดำเนินการต่อ</button>
-    </div>
-
-    <div id="page-payment" class="page">
-        <h3>📍 ยืนยันคำสั่งซื้อ</h3>
-        <div class="input-group">
-            <label>เบอร์โทรศัพท์ติดต่อ</label>
-            <input type="tel" id="cust-phone" placeholder="08x-xxx-xxxx">
-        </div>
-        <div class="input-group">
-            <label>ช่องทางการจ่ายเงิน</label>
-            <select id="pay-method" style="width:100%; border:none; outline:none; font-size:14px;">
-                <option value="โอนเงิน">โอนผ่านธนาคาร (PromptPay)</option>
-                <option value="เงินสด">เงินสดปลายทาง</option>
-            </select>
-        </div>
-        <button class="btn-blue" onclick="confirmOrder()">ยืนยันสั่งอาหาร</button>
-    </div>
-
-    <div id="page-admin" class="page">
-        <h3 style="margin-top:0;">📊 แผงควบคุมคนขาย</h3>
+<div class="app-container">
+    <div class="content-area">
         
-        <div class="admin-stat-grid">
-            <div class="stat-card">
-                <h4>ยอดขายวันนี้</h4>
-                <p id="stat-sales">0</p>
+        <div id="page-login" class="page active">
+            <div class="app-header">
+                <div style="font-size: 64px; margin-top: 40px;">🍛</div>
+                <h1>ไทย ฟู้ดส์</h1>
+                <p style="color: #666;">สั่งง่าย จ่ายสะดวก ถึงไว</p>
             </div>
-            <div class="stat-card">
-                <h4>ออเดอร์ทั้งหมด</h4>
-                <p id="stat-count">0</p>
+            <div class="input-group">
+                <label>ระบุชื่อของคุณ</label>
+                <input type="text" id="login-user" placeholder="ตัวอย่าง: คุณสมชาย">
             </div>
+            <button class="btn-blue" onclick="handleLogin()">เริ่มสั่งอาหาร</button>
+            <div style="height: 50px;"></div>
+            <p onclick="navTo('page-admin')" style="text-align:center; font-size:12px; color:#aaa; cursor:pointer;">
+                🔒 ระบบจัดการสำหรับร้านค้า
+            </p>
         </div>
 
-        <div style="display:flex; gap:5px; margin-bottom:15px;">
-            <button onclick="exportCSV()" style="flex:1; background:var(--success); color:white; border:none; padding:8px; border-radius:8px; font-size:12px;">💾 สำรอง CSV</button>
-            <button onclick="clearAllData()" style="flex:1; background:var(--danger); color:white; border:none; padding:8px; border-radius:8px; font-size:12px;">🗑️ ล้างข้อมูล</button>
+        <div id="page-menu" class="page">
+            <h2 style="color: var(--primary);">เมนูวันนี้</h2>
+            <div id="menu-list"></div>
         </div>
 
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr><th>ลูกค้า</th><th>ยอด</th><th>สถานะ</th></tr>
-                </thead>
-                <tbody id="admin-table-body"></tbody>
-            </table>
+        <div id="page-order" class="page">
+            <h2 style="color: var(--primary);">🧾 สรุปออเดอร์ของคุณ</h2>
+            <div class="order-summary">
+                <div id="order-details">
+                    </div>
+                
+                <div class="input-group" style="margin-top:20px; border: 1px solid #ddd;">
+                    <label>เลือกวิธีชำระเงิน</label>
+                    <select id="pay-method">
+                        <option value="เงินสด">💵 เงินสด (ปลายทาง)</option>
+                        <option value="โอนผ่านธนาคาร">📱 โอนผ่านธนาคาร (PromptPay)</option>
+                    </select>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; margin-top:20px; font-size:20px; font-weight:bold;">
+                    <span>ยอดรวมทั้งสิ้น:</span>
+                    <span id="order-total" style="color:var(--primary);">0 ฿</span>
+                </div>
+            </div>
+            <button class="btn-blue" id="confirm-order-btn" onclick="submitOrderToGoogle()">✅ ยืนยันการสั่งซื้อ</button>
+            <button onclick="navTo('page-menu')" style="width:100%; background:none; border:none; color:#888; margin-top:15px; cursor:pointer;">⬅️ กลับไปเลือกเพิ่ม</button>
         </div>
-        <button class="btn-blue" style="margin-top:20px; background:#666;" onclick="navTo('page-login')">กลับหน้าหลัก</button>
+
+        <div id="page-admin" class="page">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3 style="margin:0;">📈 ยอดสั่งซื้อล่าสุด</h3>
+                <button onclick="refreshAdminDashboard()" style="background:none; border:none; font-size:18px;">🔄</button>
+            </div>
+            <div id="stat-container" style="background:var(--primary); color:white; padding:15px; border-radius:12px; margin-bottom:15px;">
+                <small>รวมยอดขาย (Real-time)</small>
+                <div id="stat-sales" style="font-size:24px; font-weight:bold;">0 ฿</div>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>ลูกค้า</th><th>รายการ</th><th>ยอด</th></tr></thead>
+                    <tbody id="admin-table-body"></tbody>
+                </table>
+            </div>
+            <button onclick="navTo('page-login')" style="width:100%; margin-top:20px; background:none; border:none; color:#888;">ออกจากระบบ</button>
+        </div>
+
     </div>
 
     <div class="bottom-nav" id="main-nav" style="display:none;">
-        <button class="nav-item active" id="nav-menu" onclick="navTo('page-menu')">🏠<br>ร้านค้า</button>
-        <button class="nav-item" id="nav-cart" onclick="navTo('page-cart')">🛒<br>ตะกร้า (<span id="cart-count">0</span>)</button>
-        <button class="nav-item" onclick="navTo('page-login')">👤<br>ฉัน</button>
+        <button class="nav-item active" id="nav-home" onclick="navTo('page-menu')">🏠<br>หน้าหลัก</button>
+        <button class="nav-item" id="nav-order" onclick="navTo('page-order')">📋<br>ออเดอร์</button>
+        <button class="nav-item" onclick="navTo('page-login')">👤<br>บัญชี</button>
     </div>
 </div>
 
 <script>
-    let cart = [];
-    let allOrders = JSON.parse(localStorage.getItem('thai_food_orders')) || [];
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz6fwMOGo2OO46jjc3TGNupZPKM4YgnBN2KGjkewkeF3oBtQQZtGYjc7HOuBg-eb2gj/exec";
+
+    const menuData = [
+        { name: 'กะเพราไก่ไข่ดาว', price: 60, icon: '🍳' },
+        { name: 'ข้าวผัดต้มยำ', price: 75, icon: '🔥' },
+        { name: 'ส้มตำไทย', price: 50, icon: '🥗' },
+        { name: 'ต้มจืดเต้าหู้', price: 80, icon: '🥣' }
+    ];
+
+    let currentCart = []; // เก็บรายการที่เลือก
 
     function navTo(pageId) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.getElementById(pageId).classList.add('active');
         
-        // จัดการ Bottom Nav
-        const hideNav = ['page-login', 'page-admin'].includes(pageId);
-        document.getElementById('main-nav').style.display = hideNav ? 'none' : 'flex';
+        // จัดการสีปุ่ม Nav
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        if(pageId === 'page-menu') document.getElementById('nav-home').classList.add('active');
+        if(pageId === 'page-order') {
+            document.getElementById('nav-order').classList.add('active');
+            renderOrderSummary();
+        }
 
-        // จัดการเมนู Active
-        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        if(pageId === 'page-menu') document.getElementById('nav-menu').classList.add('active');
-        if(pageId === 'page-cart') document.getElementById('nav-cart').classList.add('active');
+        const isPublic = ['page-login', 'page-admin'].includes(pageId);
+        document.getElementById('main-nav').style.display = isPublic ? 'none' : 'flex';
 
         if(pageId === 'page-admin') refreshAdminDashboard();
     }
 
-    function addToCart(name, price) {
-        cart.push({name, price});
-        document.getElementById('cart-count').innerText = cart.length;
-        updateCartUI();
-        alert('เพิ่มลงตะกร้าแล้ว!');
-    }
-
-    function updateCartUI() {
-        const cartDiv = document.getElementById('cart-items');
-        if(cart.length === 0) {
-            cartDiv.innerHTML = '<p style="text-align:center; color:#999;">ไม่มีสินค้าในตะกร้า</p>';
-        } else {
-            cartDiv.innerHTML = cart.map((item, idx) => `
-                <div class="food-card">
-                    <div class="food-info"><strong>${item.name}</strong></div>
-                    <div>${item.price} บ.</div>
-                </div>
-            `).join('');
-        }
-        const total = cart.reduce((sum, item) => sum + item.price, 0);
-        document.getElementById('total-price').innerText = total + " บาท";
-    }
-
-    function confirmOrder() {
-        if(cart.length === 0) return alert('กรุณาเลือกอาหารก่อนครับ');
-        
-        const user = document.getElementById('login-user').value || 'ลูกค้าทั่วไป';
-        const total = cart.reduce((sum, item) => sum + item.price, 0);
-        
-        const newOrder = {
-            id: Date.now(),
-            customer: user,
-            items: cart.map(i => i.name).join('/'),
-            total: total,
-            pay: document.getElementById('pay-method').value,
-            status: 'รอดำเนินการ',
-            time: new Date().toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'})
-        };
-
-        allOrders.push(newOrder);
-        localStorage.setItem('thai_food_orders', JSON.stringify(allOrders));
-        
-        alert('ส่งออเดอร์ถึงคนขายเรียบร้อย!');
-        cart = [];
-        document.getElementById('cart-count').innerText = 0;
-        updateCartUI();
+    function handleLogin() {
+        const user = document.getElementById('login-user').value;
+        if(!user) return alert('กรุณาใส่ชื่อของคุณก่อนครับ');
+        renderMenu();
         navTo('page-menu');
     }
 
-    function refreshAdminDashboard() {
-        const tbody = document.getElementById('admin-table-body');
-        const totalSales = allOrders.reduce((sum, o) => sum + o.total, 0);
-        
-        document.getElementById('stat-sales').innerText = totalSales.toLocaleString() + " ฿";
-        document.getElementById('stat-count').innerText = allOrders.length;
-
-        tbody.innerHTML = allOrders.slice().reverse().map(o => `
-            <tr>
-                <td>${o.customer}<br><small color="#888">${o.time}</small></td>
-                <td>${o.total}</td>
-                <td>
-                    <span class="status-badge ${o.status === 'ส่งแล้ว' ? 'bg-done' : 'bg-wait'}" 
-                          onclick="updateStatus(${o.id})">
-                        ${o.status}
-                    </span>
-                </td>
-            </tr>
+    function renderMenu() {
+        const menuList = document.getElementById('menu-list');
+        menuList.innerHTML = menuData.map(item => `
+            <div class="food-card">
+                <div style="font-size:24px; margin-right:15px;">${item.icon}</div>
+                <div class="food-info">
+                    <strong>${item.name}</strong><br>
+                    <small style="color:#888;">ราคา ${item.price} บาท</small>
+                </div>
+                <button class="add-btn" onclick="addToOrder('${item.name}', ${item.price})">เลือก</button>
+            </div>
         `).join('');
     }
 
-    function updateStatus(orderId) {
-        const idx = allOrders.findIndex(o => o.id === orderId);
-        if(idx > -1) {
-            allOrders[idx].status = allOrders[idx].status === 'ส่งแล้ว' ? 'รอดำเนินการ' : 'ส่งแล้ว';
-            localStorage.setItem('thai_food_orders', JSON.stringify(allOrders));
-            refreshAdminDashboard();
+    function addToOrder(name, price) {
+        currentCart.push({ name, price });
+        alert(`เพิ่ม ${name} ลงในออเดอร์แล้ว`);
+        navTo('page-order'); // เมื่อเลือกแล้วให้เด้งไปหน้าสรุปออเดอร์
+    }
+
+    function renderOrderSummary() {
+        const details = document.getElementById('order-details');
+        const totalElem = document.getElementById('order-total');
+        
+        if(currentCart.length === 0) {
+            details.innerHTML = "<p style='text-align:center; color:#999;'>ยังไม่มีรายการอาหารในออเดอร์</p>";
+            totalElem.innerText = "0 ฿";
+            return;
+        }
+
+        let total = 0;
+        details.innerHTML = currentCart.map((item, index) => {
+            total += item.price;
+            return `
+                <div class="order-item-row">
+                    <span>${item.name}</span>
+                    <span>${item.price} ฿ <button onclick="removeItem(${index})" style="background:none; border:none; color:red; margin-left:10px;">✕</button></span>
+                </div>
+            `;
+        }).join('');
+        totalElem.innerText = total.toLocaleString() + " ฿";
+    }
+
+    function removeItem(index) {
+        currentCart.splice(index, 1);
+        renderOrderSummary();
+    }
+
+    async function submitOrderToGoogle() {
+        if(currentCart.length === 0) return alert('กรุณาเลือกอาหารก่อนยืนยันครับ');
+        
+        const user = document.getElementById('login-user').value || 'Anonymous';
+        const payMethod = document.getElementById('pay-method').value;
+        const total = currentCart.reduce((sum, item) => sum + item.price, 0);
+        const allItems = currentCart.map(i => i.name).join(', ');
+
+        const data = {
+            customer: user,
+            items: allItems,
+            total: total,
+            pay: payMethod
+        };
+
+        const btn = document.getElementById('confirm-order-btn');
+        btn.innerText = "⏳ กำลังบันทึกออเดอร์...";
+        btn.disabled = true;
+
+        try {
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify(data)
+            });
+            
+            alert('🎉 สั่งซื้อสำเร็จ! ร้านค้าได้รับออเดอร์ของคุณแล้ว');
+            currentCart = []; // ล้างออเดอร์หลังสั่งเสร็จ
+            navTo('page-menu');
+        } catch (e) {
+            alert('เกิดข้อผิดพลาดในการเชื่อมต่อ');
+        } finally {
+            btn.innerText = "✅ ยืนยันการสั่งซื้อ";
+            btn.disabled = false;
         }
     }
 
-    function exportCSV() {
-        if(allOrders.length === 0) return alert('ไม่มีข้อมูลให้สำรอง');
-        let csv = "\uFEFF"; // BOM เพื่อให้ Excel อ่านภาษาไทยออก
-        csv += "Time,Customer,Items,Total,Payment,Status\n";
-        allOrders.forEach(o => {
-            csv += `${o.time},${o.customer},${o.items},${o.total},${o.pay},${o.status}\n`;
-        });
-        
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = `backup_orders_${new Date().toLocaleDateString()}.csv`;
-        link.click();
-    }
+    async function refreshAdminDashboard() {
+        const tbody = document.getElementById('admin-table-body');
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px;">🔄 กำลังดึงข้อมูลล่าสุด...</td></tr>';
 
-    function clearAllData() {
-        if(confirm('ต้องการล้างข้อมูลออเดอร์ทั้งหมดใช่หรือไม่? (แนะนำให้ Backup ก่อน)')) {
-            allOrders = [];
-            localStorage.removeItem('thai_food_orders');
-            refreshAdminDashboard();
+        try {
+            const response = await fetch(SCRIPT_URL);
+            const data = await response.json();
+            
+            let totalSales = 0;
+            tbody.innerHTML = data.reverse().slice(0, 30).map(row => {
+                totalSales += parseFloat(row[3]) || 0;
+                return `
+                    <tr>
+                        <td><strong>${row[1]}</strong><br><small style="color:#999;">${row[4]}</small></td>
+                        <td>${row[2]}</td>
+                        <td style="color:var(--primary); font-weight:bold;">${row[3]}</td>
+                    </tr>
+                `;
+            }).join('');
+            
+            document.getElementById('stat-sales').innerText = totalSales.toLocaleString() + " ฿";
+        } catch (error) {
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:red;">เชื่อมต่อ Sheets ไม่ได้</td></tr>';
         }
     }
 </script>
